@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Genshin Impact 7.0 — Maintenance Countdown</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0a0e2e 0%, #1a1155 35%, #2d1b6b 60%, #4a2a8f 100%);
+    overflow-x: hidden;
+    color: #fff;
+  }
+
+  /* floating glow orbs for atmosphere */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    z-index: 0;
+    animation: float 12s ease-in-out infinite;
+  }
+  .orb1 { width: 350px; height: 350px; background: #7b5cff; top: -80px; left: -80px; }
+  .orb2 { width: 300px; height: 300px; background: #ff9ecb; bottom: -60px; right: -60px; animation-delay: 3s; }
+  .orb3 { width: 250px; height: 250px; background: #4dd0e1; top: 40%; left: 60%; animation-delay: 6s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-30px) translateX(20px); }
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #ffd76a;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    margin: 0 0 8px 0;
+    background: linear-gradient(90deg, #ffe08a, #ff9ecb, #a78bfa, #6ee7f5);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 6s ease infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 40px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 40px 50px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 40px rgba(123, 92, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .timer {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+  }
+
+  .num {
+    font-size: clamp(44px, 8vw, 68px);
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #ffffff, #c9d6ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 30px rgba(167, 139, 250, 0.6);
+  }
+
+  .label {
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    color: #a78bfa;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  .colon {
+    font-size: clamp(30px, 6vw, 50px);
+    font-weight: 700;
+    color: rgba(255,255,255,0.3);
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
+  .done {
+    font-size: 34px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #ffd76a, #ff9ecb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .info {
+    margin-top: 24px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+  }
+
+  .info b { color: #ffd76a; }
+
+  .watermark {
+    margin-top: 34px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .watermark::before, .watermark::after {
+    content: "";
+    height: 1px;
+    width: 30px;
+    background: rgba(255,255,255,0.25);
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="page">
+  <div class="eyebrow">Sunny Summer Fontinalia</div>
+  <h1>Genshin Impact 7.0 Countdown</h1>
+  <div class="subtitle">Time remaining until server maintenance begins</div>
+
+  <div class="card">
+    <div class="timer" id="timer">
+      <div class="block"><div class="num" id="d">00</div><div class="label">DAYS</div></div>
+      <div class="colon">:</div>
+      <div class="block"><div class="num" id="h">00</div><div class="label">HOURS</div></div>
+      <div class="colon">:</div>
+      <div class="block"><div class="num" id="m">00</div><div class="label">MINUTES</div></div>
+      <div class="colon">:</div>
+      <div class="block"><div class="num" id="s">00</div><div class="label">SECONDS</div></div>
+    </div>
+    <div class="info">Maintenance starts <b>Wed, Aug 12, 2026 · 3:30 AM GMT+5:30</b><br>Maintenance Rewards: <b>Primogems ×300</b></div>
+  </div>
+
+  <div class="watermark">@Genshinimpactzone</div>
+</div>
+
+<script>
+  const target = new Date("2026-08-12T03:30:00+05:30").getTime();
+
+  const dEl = document.getElementById('d');
+  const hEl = document.getElementById('h');
+  const mEl = document.getElementById('m');
+  const sEl = document.getElementById('s');
+  const timerEl = document.getElementById('timer');
+
+  function pad(n) { return n.toString().padStart(2, '0'); }
+
+  function tick() {
+    let diff = target - Date.now();
+
+    if (diff <= 0) {
+      timerEl.innerHTML = '<div class="done">MAINTENANCE IS LIVE</div>';
+      return;
+    }
+
+    const days = Math.floor(diff / 86400000);
+    diff -= days * 86400000;
+    const hours = Math.floor(diff / 3600000);
+    diff -= hours * 3600000;
+    const minutes = Math.floor(diff / 60000);
+    diff -= minutes * 60000;
+    const seconds = Math.floor(diff / 1000);
+
+    dEl.textContent = pad(days);
+    hEl.textContent = pad(hours);
+    mEl.textContent = pad(minutes);
+    sEl.textContent = pad(seconds);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+
+</body>
+</html>
