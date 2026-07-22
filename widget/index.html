@@ -48,19 +48,41 @@
     max-width: 420px;
     /* Separate image just for the card — upload as widget-bg.jpg
        at repo root, or change the filename below. */
-    background: linear-gradient(180deg, rgba(13,27,61,0.45), rgba(13,27,61,0.88)), url('/widget-bg.jpg');
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03)),
+      linear-gradient(180deg, rgba(13,27,61,0.45), rgba(13,27,61,0.88)),
+      url('/widget-bg.jpg');
     background-size: cover;
     background-position: center 5%;
     background-repeat: no-repeat;
-    border: 1px solid rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.35);
     border-radius: 28px;
     padding: 22px;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    box-shadow: 0 8px 32px rgba(0,0,20,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    box-shadow:
+      0 8px 32px rgba(0,0,20,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      inset 0 0 40px rgba(255,255,255,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle top-edge light reflection, like iOS glass surfaces */
+  .widget::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0));
+    pointer-events: none;
   }
 
   .top-row {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -88,15 +110,9 @@
     border-radius: 20px;
   }
 
-  .quote {
-    font-size: 14px;
-    line-height: 1.5;
-    color: rgba(255,255,255,0.85);
-    margin-bottom: 18px;
-    font-style: italic;
-  }
-
   .timer {
+    position: relative;
+    z-index: 1;
     display: flex;
     justify-content: space-between;
     gap: 8px;
@@ -126,6 +142,8 @@
   }
 
   .footer {
+    position: relative;
+    z-index: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -148,6 +166,8 @@
   }
 
   .install-btn {
+    position: relative;
+    z-index: 1;
     display: none;
     margin: 16px auto 0;
     background: rgba(255,255,255,0.15);
@@ -170,8 +190,6 @@
     <div class="tag">SNEZHNAYA</div>
     <div class="icon-btn">⚙️</div>
   </div>
-
-  <div class="quote">"The frost does not wait for the unprepared. Ready yourself before the maintenance begins."</div>
 
   <div class="timer" id="timer">
     <div class="block"><div class="num" id="d">00</div><div class="label">DAYS</div></div>
