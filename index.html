@@ -168,6 +168,36 @@
     width: 30px;
     background: rgba(255,255,255,0.25);
   }
+
+  /* OBS mode: activated by ?obs=1 in the URL.
+     Strips everything down to just the glowing numbers
+     on a fully transparent background, sized for a
+     browser source crop-free capture. */
+  body.obs-mode {
+    background: transparent !important;
+  }
+  body.obs-mode .orb,
+  body.obs-mode .eyebrow,
+  body.obs-mode h1,
+  body.obs-mode .subtitle,
+  body.obs-mode .card,
+  body.obs-mode .info,
+  body.obs-mode .watermark {
+    display: none !important;
+  }
+  body.obs-mode .page {
+    padding: 0;
+    min-height: auto;
+  }
+  body.obs-mode .timer {
+    gap: 20px;
+  }
+  body.obs-mode .num {
+    text-shadow: 0 0 20px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.9);
+  }
+  body.obs-mode .label {
+    text-shadow: 0 0 10px rgba(0,0,0,0.9);
+  }
 </style>
 </head>
 <body>
@@ -198,6 +228,11 @@
 </div>
 
 <script>
+  // Enable OBS mode if ?obs=1 is present in the URL
+  if (new URLSearchParams(window.location.search).get('obs') === '1') {
+    document.body.classList.add('obs-mode');
+  }
+
   const target = new Date("2026-08-12T03:30:00+05:30").getTime();
 
   const dEl = document.getElementById('d');
