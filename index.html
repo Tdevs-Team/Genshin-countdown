@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Genshin Impact 7.0 — Maintenance Countdown</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snezhnaya Countdown Widget</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1b3d">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/bg-snezhnaya.jpg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -12,229 +17,172 @@
   html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    height: 100%;
     min-height: 100vh;
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0a0e2e 0%, #1a1155 35%, #2d1b6b 60%, #4a2a8f 100%);
-    overflow-x: hidden;
     color: #fff;
+    overflow: hidden;
+    touch-action: manipulation;
   }
 
-  /* floating glow orbs for atmosphere */
-  .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.35;
-    z-index: 0;
-    animation: float 12s ease-in-out infinite;
-  }
-  .orb1 { width: 350px; height: 350px; background: #7b5cff; top: -80px; left: -80px; }
-  .orb2 { width: 300px; height: 300px; background: #ff9ecb; bottom: -60px; right: -60px; animation-delay: 3s; }
-  .orb3 { width: 250px; height: 250px; background: #4dd0e1; top: 40%; left: 60%; animation-delay: 6s; }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0) translateX(0); }
-    50% { transform: translateY(-30px) translateX(20px); }
-  }
-
-  .page {
-    position: relative;
-    z-index: 1;
+  body {
+    background: linear-gradient(160deg, #060a1a, #0d1530);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    padding: 40px 20px;
-    text-align: center;
+    padding: 24px;
+    position: fixed;
+    inset: 0;
   }
 
-  .eyebrow {
-    font-size: 14px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: #ffd76a;
+  .widget {
+    width: 100%;
+    max-width: 420px;
+    /* Upload your image to the repo root as bg-snezhnaya.jpg
+       (or change the filename below to whatever you name it) */
+    background: linear-gradient(180deg, rgba(13,27,61,0.45), rgba(13,27,61,0.88)), url('/bg-snezhnaya.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 28px;
+    padding: 22px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 8px 32px rgba(0,0,20,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+
+  .top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+  }
+
+  .tag {
+    font-size: 12px;
     font-weight: 600;
-    margin-bottom: 12px;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
   }
 
-  h1 {
-    font-size: clamp(28px, 5vw, 48px);
-    font-weight: 800;
-    margin: 0 0 8px 0;
-    background: linear-gradient(90deg, #ffe08a, #ff9ecb, #a78bfa, #6ee7f5);
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: shimmer 6s ease infinite;
-  }
-
-  @keyframes shimmer {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  .subtitle {
-    font-size: 16px;
-    color: rgba(255,255,255,0.75);
-    margin-bottom: 40px;
-  }
-
-  .card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 24px;
-    padding: 40px 50px;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 8px 40px rgba(123, 92, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+  .quote {
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 18px;
+    font-style: italic;
   }
 
   .timer {
     display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 90px;
-  }
-
-  .num {
-    font-size: clamp(44px, 8vw, 68px);
-    font-weight: 800;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    background: linear-gradient(180deg, #ffffff, #c9d6ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 30px rgba(167, 139, 250, 0.6);
-  }
-
-  .label {
-    font-size: 13px;
-    letter-spacing: 2.5px;
-    color: #a78bfa;
-    font-weight: 600;
-    margin-top: 6px;
-  }
-
-  .colon {
-    font-size: clamp(30px, 6vw, 50px);
-    font-weight: 700;
-    color: rgba(255,255,255,0.3);
-    align-self: flex-start;
-    margin-top: 4px;
-  }
-
-  .done {
-    font-size: 34px;
-    font-weight: 800;
-    background: linear-gradient(90deg, #ffd76a, #ff9ecb);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .info {
-    margin-top: 24px;
-    font-size: 14px;
-    color: rgba(255,255,255,0.6);
-    line-height: 1.6;
-  }
-
-  .info b { color: #ffd76a; }
-
-  .watermark {
-    margin-top: 34px;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    color: rgba(255,255,255,0.5);
-    display: flex;
-    align-items: center;
+    justify-content: space-between;
     gap: 8px;
   }
 
-  .watermark::before, .watermark::after {
-    content: "";
-    height: 1px;
-    width: 30px;
-    background: rgba(255,255,255,0.25);
+  .block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 10px 0;
   }
 
-  /* OBS mode: activated by ?obs=1 in the URL.
-     Strips everything down to just the glowing numbers
-     on a fully transparent background, sized for a
-     browser source crop-free capture. */
-  body.obs-mode {
-    background: transparent !important;
+  .num {
+    font-size: 26px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
   }
-  body.obs-mode .orb,
-  body.obs-mode .eyebrow,
-  body.obs-mode h1,
-  body.obs-mode .subtitle,
-  body.obs-mode .card,
-  body.obs-mode .info,
-  body.obs-mode .watermark {
-    display: none !important;
+
+  .label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
   }
-  body.obs-mode .page {
-    padding: 0;
-    min-height: auto;
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
   }
-  body.obs-mode .timer {
-    gap: 20px;
+
+  .watermark {
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
-  body.obs-mode .num {
-    text-shadow: 0 0 20px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.9);
+
+  .done {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffd76a;
+    padding: 20px 0;
   }
-  body.obs-mode .label {
-    text-shadow: 0 0 10px rgba(0,0,0,0.9);
+
+  .install-btn {
+    display: none;
+    margin: 16px auto 0;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 20px;
+    cursor: pointer;
   }
 </style>
 </head>
 <body>
 
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
-<div class="orb orb3"></div>
-
-<div class="page">
-  <div class="eyebrow">Sunny Summer Fontinalia</div>
-  <h1>Genshin Impact 7.0 Countdown</h1>
-  <div class="subtitle">Time remaining until server maintenance begins</div>
-
-  <div class="card">
-    <div class="timer" id="timer">
-      <div class="block"><div class="num" id="d">00</div><div class="label">DAYS</div></div>
-      <div class="colon">:</div>
-      <div class="block"><div class="num" id="h">00</div><div class="label">HOURS</div></div>
-      <div class="colon">:</div>
-      <div class="block"><div class="num" id="m">00</div><div class="label">MINUTES</div></div>
-      <div class="colon">:</div>
-      <div class="block"><div class="num" id="s">00</div><div class="label">SECONDS</div></div>
-    </div>
-    <div class="info">Maintenance starts <b>Wed, Aug 12, 2026 · 3:30 AM GMT+5:30</b><br>Maintenance Rewards: <b>Primogems ×300</b></div>
+<div class="widget">
+  <div class="top-row">
+    <div class="icon-btn">❄️</div>
+    <div class="tag">SNEZHNAYA</div>
+    <div class="icon-btn">⚙️</div>
   </div>
 
-  <div class="watermark">@Genshinimpactzone</div>
+  <div class="quote">"The frost does not wait for the unprepared. Ready yourself before the maintenance begins."</div>
+
+  <div class="timer" id="timer">
+    <div class="block"><div class="num" id="d">00</div><div class="label">DAYS</div></div>
+    <div class="block"><div class="num" id="h">00</div><div class="label">HRS</div></div>
+    <div class="block"><div class="num" id="m">00</div><div class="label">MIN</div></div>
+    <div class="block"><div class="num" id="s">00</div><div class="label">SEC</div></div>
+  </div>
+
+  <div class="footer">
+    <span>Genshin 7.0 Maintenance</span>
+    <span class="watermark">@Genshinimpactzone</span>
+  </div>
+
+  <button class="install-btn" id="installBtn">+ Add to Home Screen</button>
 </div>
 
 <script>
-  // Enable OBS mode if ?obs=1 is present in the URL
-  if (new URLSearchParams(window.location.search).get('obs') === '1') {
-    document.body.classList.add('obs-mode');
-  }
-
   const target = new Date("2026-08-12T03:30:00+05:30").getTime();
-
   const dEl = document.getElementById('d');
   const hEl = document.getElementById('h');
   const mEl = document.getElementById('m');
@@ -245,12 +193,10 @@
 
   function tick() {
     let diff = target - Date.now();
-
     if (diff <= 0) {
       timerEl.innerHTML = '<div class="done">MAINTENANCE IS LIVE</div>';
       return;
     }
-
     const days = Math.floor(diff / 86400000);
     diff -= days * 86400000;
     const hours = Math.floor(diff / 3600000);
@@ -258,15 +204,36 @@
     const minutes = Math.floor(diff / 60000);
     diff -= minutes * 60000;
     const seconds = Math.floor(diff / 1000);
-
     dEl.textContent = pad(days);
     hEl.textContent = pad(hours);
     mEl.textContent = pad(minutes);
     sEl.textContent = pad(seconds);
   }
-
   tick();
   setInterval(tick, 1000);
+
+  // "Add to Home Screen" prompt (Android/Chrome)
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+  });
+
+  // Register service worker so Chrome treats this as installable
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 </script>
 
 </body>
