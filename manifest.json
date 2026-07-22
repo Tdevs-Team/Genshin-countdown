@@ -1,0 +1,22 @@
+{
+  "name": "Snezhnaya Countdown",
+  "short_name": "Countdown",
+  "start_url": "/widget",
+  "display": "standalone",
+  "background_color": "#0d1b3d",
+  "theme_color": "#0d1b3d",
+  "icons": [
+    {
+      "src": "/bg-snezhnaya.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/bg-snezhnaya.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
