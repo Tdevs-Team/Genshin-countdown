@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OBS Stream Countdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+
+  html {
+    background: transparent;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .timer {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+  }
+
+  .num {
+    font-size: 68px;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.9);
+  }
+
+  .label {
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    color: #d9c9ff;
+    font-weight: 700;
+    margin-top: 6px;
+    text-shadow: 0 0 10px rgba(0,0,0,0.9);
+  }
+
+  .colon {
+    font-size: 50px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+    text-shadow: 0 0 10px rgba(0,0,0,0.9);
+  }
+
+  .done {
+    font-size: 34px;
+    font-weight: 800;
+    color: #ffd76a;
+    text-shadow: 0 0 20px rgba(0,0,0,0.9);
+  }
+</style>
+</head>
+<body>
+
+<div class="timer" id="timer">
+  <div class="block"><div class="num" id="d">00</div><div class="label">DAYS</div></div>
+  <div class="colon">:</div>
+  <div class="block"><div class="num" id="h">00</div><div class="label">HOURS</div></div>
+  <div class="colon">:</div>
+  <div class="block"><div class="num" id="m">00</div><div class="label">MINUTES</div></div>
+  <div class="colon">:</div>
+  <div class="block"><div class="num" id="s">00</div><div class="label">SECONDS</div></div>
+</div>
+
+<script>
+  const target = new Date("2026-08-12T03:30:00+05:30").getTime();
+
+  const dEl = document.getElementById('d');
+  const hEl = document.getElementById('h');
+  const mEl = document.getElementById('m');
+  const sEl = document.getElementById('s');
+  const timerEl = document.getElementById('timer');
+
+  function pad(n) { return n.toString().padStart(2, '0'); }
+
+  function tick() {
+    let diff = target - Date.now();
+
+    if (diff <= 0) {
+      timerEl.innerHTML = '<div class="done">MAINTENANCE IS LIVE</div>';
+      return;
+    }
+
+    const days = Math.floor(diff / 86400000);
+    diff -= days * 86400000;
+    const hours = Math.floor(diff / 3600000);
+    diff -= hours * 3600000;
+    const minutes = Math.floor(diff / 60000);
+    diff -= minutes * 60000;
+    const seconds = Math.floor(diff / 1000);
+
+    dEl.textContent = pad(days);
+    hEl.textContent = pad(hours);
+    mEl.textContent = pad(minutes);
+    sEl.textContent = pad(seconds);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+
+</body>
+</html>
