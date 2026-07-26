@@ -45,17 +45,30 @@
     text-shadow: 0 0 10px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.9);
   }
 
+  .count-wrap {
+    position: relative;
+    display: inline-block;
+    height: 33px;
+    min-width: 60px;
+    overflow: hidden;
+  }
+
   .count {
+    position: absolute;
+    left: 0;
+    top: 0;
     font-size: 26px;
     font-weight: 800;
     color: #ffffff;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 0 10px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.9);
-    min-width: 60px;
+    white-space: nowrap;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
   }
 
   .count.loading {
     opacity: 0.5;
+    position: static;
   }
 </style>
 </head>
@@ -65,7 +78,9 @@
   <img class="logo" id="logo" alt="">
   <div class="text-block">
     <span class="label">Subscribers:</span>
-    <span class="count loading" id="count">···</span>
+    <div class="count-wrap" id="countWrap">
+      <span class="count loading" id="count">···</span>
+    </div>
   </div>
 </div>
 
@@ -73,18 +88,56 @@
   // ===== CONFIG — fill these in =====
   const API_KEY = "AIzaSyCEdgw4GXGwWyzP9iQqIHTsxrKaZiqry4k";
   const CHANNEL_ID = "UCxP5eJLTMjn24M73tqOW2Xw"; // starts with UC...
-  const REFRESH_SECONDS = 60; // how often to poll for new count
+  const REFRESH_SECONDS = 12; // how often to poll for new count
   // ===================================
 
-  const countEl = document.getElementById('count');
+  const countWrap = document.getElementById('countWrap');
   const logoEl = document.getElementById('logo');
   let logoLoaded = false;
+  let lastRawCount = null;
+  let firstLoad = true;
 
   function formatCount(n) {
     n = parseInt(n, 10);
     if (n >= 1000000) return (n / 1000000).toFixed(2).replace(/\.00$/, '') + 'M';
     if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
     return n.toString();
+  }
+
+  function renderCount(rawCount) {
+    const text = formatCount(rawCount);
+    const oldEl = document.getElementById('count');
+
+    // First load: just place the number, no slide.
+    if (firstLoad) {
+      oldEl.textContent = text;
+      oldEl.classList.remove('loading');
+      oldEl.style.position = 'absolute';
+      firstLoad = false;
+      return;
+    }
+
+    // No change since last check — nothing to animate.
+    if (rawCount === lastRawCount) return;
+
+    const increased = rawCount > lastRawCount;
+
+    const newEl = document.createElement('span');
+    newEl.className = 'count';
+    newEl.id = 'count';
+    newEl.textContent = text;
+    // New number starts off-screen: below if going up, above if going down.
+    newEl.style.transform = increased ? 'translateY(100%)' : 'translateY(-100%)';
+    countWrap.appendChild(newEl);
+
+    // Force layout, then animate both old and new into place.
+    requestAnimationFrame(() => {
+      oldEl.style.transform = increased ? 'translateY(-100%)' : 'translateY(100%)';
+      oldEl.style.opacity = '0';
+      newEl.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(() => oldEl.remove(), 420);
   }
 
   async function fetchSubs() {
@@ -95,9 +148,9 @@
 
       if (data.items && data.items.length > 0) {
         const item = data.items[0];
-        const subs = item.statistics.subscriberCount;
-        countEl.textContent = formatCount(subs);
-        countEl.classList.remove('loading');
+        const rawCount = parseInt(item.statistics.subscriberCount, 10);
+        renderCount(rawCount);
+        lastRawCount = rawCount;
 
         // Set the channel's real profile picture as the logo,
         // only once — no need to keep re-fetching the image itself.
@@ -107,10 +160,10 @@
           logoLoaded = true;
         }
       } else {
-        countEl.textContent = "ERR";
+        document.getElementById('count').textContent = "ERR";
       }
     } catch (e) {
-      countEl.textContent = "ERR";
+      document.getElementById('count').textContent = "ERR";
     }
   }
 
