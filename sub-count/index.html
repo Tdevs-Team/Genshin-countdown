@@ -34,7 +34,7 @@
 
   .text-block {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 8px;
   }
 
@@ -48,7 +48,7 @@
   .count-wrap {
     position: relative;
     display: inline-block;
-    height: 33px;
+    height: 36px;
     min-width: 60px;
     overflow: hidden;
   }
@@ -57,13 +57,17 @@
     position: absolute;
     left: 0;
     top: 0;
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
     font-size: 26px;
     font-weight: 800;
     color: #ffffff;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 0 10px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.9);
     white-space: nowrap;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
+    will-change: transform;
   }
 
   .count.loading {
@@ -88,7 +92,7 @@
   // ===== CONFIG — fill these in =====
   const API_KEY = "AIzaSyCEdgw4GXGwWyzP9iQqIHTsxrKaZiqry4k";
   const CHANNEL_ID = "UCxP5eJLTMjn24M73tqOW2Xw"; // starts with UC...
-  const REFRESH_SECONDS = 12; // how often to poll for new count
+  const REFRESH_SECONDS = 15; // how often to poll for new count
   // ===================================
 
   const countWrap = document.getElementById('countWrap');
@@ -128,16 +132,24 @@
     newEl.textContent = text;
     // New number starts off-screen: below if going up, above if going down.
     newEl.style.transform = increased ? 'translateY(100%)' : 'translateY(-100%)';
+    newEl.style.transition = 'none';
     countWrap.appendChild(newEl);
 
-    // Force layout, then animate both old and new into place.
+    // Force the browser to actually paint the off-screen starting
+    // position before we change it — otherwise both style changes
+    // can get batched into one frame and the transition never plays.
+    void newEl.offsetHeight;
+    newEl.style.transition = '';
+
     requestAnimationFrame(() => {
-      oldEl.style.transform = increased ? 'translateY(-100%)' : 'translateY(100%)';
-      oldEl.style.opacity = '0';
-      newEl.style.transform = 'translateY(0)';
+      requestAnimationFrame(() => {
+        oldEl.style.transform = increased ? 'translateY(-100%)' : 'translateY(100%)';
+        oldEl.style.opacity = '0';
+        newEl.style.transform = 'translateY(0)';
+      });
     });
 
-    setTimeout(() => oldEl.remove(), 420);
+    setTimeout(() => oldEl.remove(), 520);
   }
 
   async function fetchSubs() {
