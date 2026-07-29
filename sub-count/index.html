@@ -158,6 +158,13 @@
       const res = await fetch(url);
       const data = await res.json();
 
+      if (data.error) {
+        console.error('YouTube API error:', data.error);
+        document.getElementById('count').textContent = "ERR";
+        document.title = "ERR: " + data.error.message;
+        return;
+      }
+
       if (data.items && data.items.length > 0) {
         const item = data.items[0];
         const rawCount = parseInt(item.statistics.subscriberCount, 10);
@@ -172,9 +179,11 @@
           logoLoaded = true;
         }
       } else {
+        console.error('YouTube API returned no items:', data);
         document.getElementById('count').textContent = "ERR";
       }
     } catch (e) {
+      console.error('Fetch failed:', e);
       document.getElementById('count').textContent = "ERR";
     }
   }
