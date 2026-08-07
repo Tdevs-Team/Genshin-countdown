@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Live Chat Overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* Fills whatever size/position you give the OBS Browser Source —
+     match the Browser Source's Width/Height to your frame's box
+     (e.g. via Transform, or just set the source's own W/H) and this
+     will never spill outside it, since overflow is clipped here. */
+  .chat-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(15, 20, 35, 0.55);
+    border-radius: 12px;
+    padding: 7px 10px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: slideIn 0.35s ease;
+    max-width: 100%;
+    flex-shrink: 0;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateY(12px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+
+  .msg img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .msg-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .author {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffd76a;
+    text-shadow: 0 0 6px rgba(0,0,0,0.9);
+  }
+
+  .text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    text-shadow: 0 0 6px rgba(0,0,0,0.9);
+    word-break: break-word;
+    line-height: 1.35;
+  }
+
+  .status {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    padding: 8px 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-wrap" id="chatWrap">
+  <div class="status" id="status">Connecting to live chat…</div>
+</div>
+
+<script>
+  // ===== CONFIG — fill these in =====
+  const API_KEY = "AIzaSyCEdgw4GXGwWyzP9iQqIHTsxrKaZiqry4k";
+  const CHANNEL_ID = "UCxP5eJLTMjn24M73tqOW2Xw"; // same one from the subscriber counter, starts with UC...
+  const MAX_MESSAGES = 10; // how many messages to keep — extras get pushed off automatically
+  // ===================================
+
+  const chatWrap = document.getElementById('chatWrap');
+  let liveChatId = null;
+  let nextPageToken = null;
+
+  function clearStatus() {
+    const status = document.getElementById('status');
+    if (status) status.remove();
+  }
+
+  function addMessage(msg) {
+    clearStatus();
+
+    const el = document.createElement('div');
+    el.className = 'msg';
+    el.innerHTML = `
+      <img src="${msg.avatar}" alt="">
+      <div class="msg-body">
+        <div class="author"></div>
+        <div class="text"></div>
+      </div>
+    `;
+    el.querySelector('.author').textContent = msg.author;
+    el.querySelector('.text').textContent = msg.text;
+
+    chatWrap.appendChild(el);
+
+    while (chatWrap.children.length > MAX_MESSAGES) {
+      chatWrap.removeChild(chatWrap.firstChild);
+    }
+  }
+
+  // Finds whatever video is currently live on the channel — no manual
+  // video ID needed. Costs more quota per call than other endpoints,
+  // so this only runs every 60s while waiting, and stops once found.
+  async function findLiveVideoId() {
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.items && data.items.length > 0) {
+      return data.items[0].id.videoId;
+    }
+    return null;
+  }
+
+  async function getLiveChatId(videoId) {
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${videoId}&key=${API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.items && data.items.length > 0 && data.items[0].liveStreamingDetails) {
+      return data.items[0].liveStreamingDetails.activeLiveChatId || null;
+    }
+    return null;
+  }
+
+  async function pollChat() {
+    try {
+      let url = `https://www.googleapis.com/youtube/v3/liveChat/messages?liveChatId=${liveChatId}&part=snippet,authorDetails&key=${API_KEY}`;
+      if (nextPageToken) url += `&pageToken=${nextPageToken}`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (data.error) {
+        chatWrap.innerHTML = `<div class="status">Chat error — check API key / video ID</div>`;
+        setTimeout(pollChat, 10000);
+        return;
+      }
+
+      nextPageToken = data.nextPageToken;
+
+      (data.items || []).forEach(item => {
+        addMessage({
+          author: item.authorDetails.displayName,
+          avatar: item.authorDetails.profileImageUrl,
+          text: item.snippet.displayMessage
+        });
+      });
+
+      const wait = Math.max(data.pollingIntervalMillis || 8000, 3000);
+      setTimeout(pollChat, wait);
+    } catch (e) {
+      setTimeout(pollChat, 10000);
+    }
+  }
+
+  async function init() {
+    const videoId = await findLiveVideoId();
+    if (!videoId) {
+      chatWrap.innerHTML = `<div class="status">Waiting for stream to go live…</div>`;
+      setTimeout(init, 60000);
+      return;
+    }
+
+    liveChatId = await getLiveChatId(videoId);
+    if (!liveChatId) {
+      chatWrap.innerHTML = `<div class="status">Found stream, waiting for chat to open…</div>`;
+      setTimeout(init, 30000);
+      return;
+    }
+    pollChat();
+  }
+
+  init();
+</script>
+
+</body>
+</html>
